@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Fret — 기타 연습",
+    "slug": "guitar-practice-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#F2F2F7"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "연주 녹음을 위해 마이크 접근이 필요합니다."
+      }
+    },
+    "android": {
+      "permissions": [
+        "RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font"
+    ]
+  }
+}
