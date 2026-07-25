@@ -15,6 +15,21 @@ npx expo install expo-av react-native-webview react-native-screens react-native-
 npx expo start
 ```
 
+## 커버 영상 검색 설정 (YouTube Data API v3)
+
+곡 상세 화면의 "다른 커버 영상 검색"은 YouTube Data API v3의 `search.list`를 사용합니다. 키 발급 방법:
+
+1. [Google Cloud Console](https://console.cloud.google.com/)에서 프로젝트 생성
+2. API 및 서비스 → 라이브러리 → **YouTube Data API v3** 사용 설정
+3. 사용자 인증 정보 → API 키 생성 (필요 시 HTTP 리퍼러/앱 제한 설정)
+4. 프로젝트 루트에 `.env` 파일 생성 (`.env.example` 참고) 후 발급받은 키 입력:
+   ```
+   EXPO_PUBLIC_YOUTUBE_API_KEY=발급받은키
+   ```
+5. `npx expo start` 재시작 (환경 변수는 번들 시점에 주입되므로 재시작 필요)
+
+키가 없으면 검색 시 안내 메시지가 표시됩니다. 무료 할당량(일일 10,000 유닛, `search.list` 1회당 100유닛)이 있으니 참고하세요.
+
 ## 실제로 동작하는 것
 
 | 기능 | 구현 |

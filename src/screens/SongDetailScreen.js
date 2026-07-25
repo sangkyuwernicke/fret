@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import ABLoopSlider from '../components/ABLoopSlider';
 import SheetModal from '../components/SheetModal';
+import CoverSearchModal from '../components/CoverSearchModal';
 import { useRecordings } from '../components/RecordingsContext';
 import { C, card, fmt } from '../theme';
 
@@ -14,6 +15,8 @@ const SPEEDS = [0.5, 0.75, 0.9, 1.0];
 export default function SongDetailScreen({ route, navigation }) {
   const { song } = route.params;
   const playerRef = useRef(null);
+  const [videoId, setVideoId] = useState(song.videoId);
+  const [videoLabel, setVideoLabel] = useState(null);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(0.9);
   const [duration, setDuration] = useState(0);
@@ -21,6 +24,7 @@ export default function SongDetailScreen({ route, navigation }) {
   const [loopCount, setLoopCount] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [coverSearchOpen, setCoverSearchOpen] = useState(false);
 
   const { recordings } = useRecordings();
   const songRecordings = recordings.filter((r) => r.song === song.name);
@@ -30,6 +34,17 @@ export default function SongDetailScreen({ route, navigation }) {
       const d = await playerRef.current?.getDuration();
       if (d > 0) setDuration(d);
     } catch {}
+  };
+
+  const handleSelectCover = (item) => {
+    setPlaying(false);
+    setVideoId(item.videoId);
+    setVideoLabel(item.title);
+    setDuration(0);
+    setLoop({ a: 0, b: 0 });
+    setLoopCount(0);
+    setCurrentTime(0);
+    setCoverSearchOpen(false);
   };
 
   useEffect(() => {
@@ -95,7 +110,7 @@ export default function SongDetailScreen({ route, navigation }) {
             ref={playerRef}
             height={210}
             play={playing}
-            videoId={song.videoId}
+            videoId={videoId}
             playbackRate={speed}
             onReady={handleReady}
             onChangeState={(st) => {
@@ -104,6 +119,17 @@ export default function SongDetailScreen({ route, navigation }) {
             }}
           />
         </View>
+
+        {/* 커버 영상 검색 */}
+        <Pressable style={[card, s.coverBtn]} onPress={() => setCoverSearchOpen(true)}>
+          <View style={{ flex: 1 }}>
+            <Text style={s.coverBtnText}>🔍  다른 커버 영상 검색</Text>
+            {videoLabel && (
+              <Text style={s.coverBtnSub} numberOfLines={1}>현재: {videoLabel}</Text>
+            )}
+          </View>
+          <Ionicons name="chevron-forward" size={16} color={C.tintBlue} />
+        </Pressable>
 
         {/* A-B 반복 */}
         <View style={[card, s.section]}>
@@ -153,6 +179,12 @@ export default function SongDetailScreen({ route, navigation }) {
       </ScrollView>
 
       <SheetModal visible={sheetOpen} onClose={() => setSheetOpen(false)} song={song} />
+      <CoverSearchModal
+        visible={coverSearchOpen}
+        initialQuery={`${song.name} ${song.artist}`}
+        onClose={() => setCoverSearchOpen(false)}
+        onSelect={handleSelectCover}
+      />
     </SafeAreaView>
   );
 }
@@ -200,6 +232,13 @@ const s = StyleSheet.create({
     marginHorizontal: 20, marginTop: 4,
     borderRadius: 18, overflow: 'hidden', backgroundColor: '#1d1d21',
   },
+  coverBtn: {
+    marginHorizontal: 20, marginTop: 10,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    padding: 14,
+  },
+  coverBtnText: { fontSize: 14, fontWeight: '600', color: C.tintBlue },
+  coverBtnSub: { fontSize: 11, color: C.muted, marginTop: 2 },
   section: { marginHorizontal: 20, marginTop: 12, padding: 16 },
 
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
